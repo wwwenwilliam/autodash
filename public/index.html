@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>aUToDash — WBS Dashboard</title>
+    <meta name="description" content="TeamGantt project dashboard for aUToDrive WBS tracking">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="/config.js"></script>
+</head>
+
+<body>
+    <!-- Loading overlay -->
+    <div id="loading-overlay">
+        <div class="loader-container">
+            <div class="loader-spinner"></div>
+            <p class="loader-text">Loading dashboard data…</p>
+            <p class="loader-sub" id="loading-status">Connecting to TeamGantt API</p>
+        </div>
+    </div>
+
+    <!-- Error overlay -->
+    <div id="error-overlay" class="hidden">
+        <div class="error-container">
+            <div class="error-icon">⚠</div>
+            <h2>Connection Error</h2>
+            <p id="error-message"></p>
+            <button onclick="location.reload()">Retry</button>
+        </div>
+    </div>
+
+    <!-- Main app -->
+    <div id="app" class="hidden">
+        <!-- Header -->
+        <header id="header">
+            <div class="header-left">
+                <img src="autoronto_logo_white.png" alt="aUToronto" style="height:72px;opacity:0.9">
+                <h1 class="logo">aUTo<span class="accent">Dash</span></h1>
+                <span class="project-name" id="project-name"></span>
+            </div>
+            <div class="header-right">
+                <span class="last-updated" id="last-updated"></span>
+                <button id="btn-refresh" class="btn-refresh" title="Refresh data">↻</button>
+            </div>
+        </header>
+
+        <!-- Navigation tabs -->
+        <nav id="nav">
+            <button class="nav-tab active" data-tab="summary">
+                <span class="tab-icon">📊</span> Summary
+            </button>
+            <button class="nav-tab" data-tab="tasks">
+                <span class="tab-icon">📋</span> Tasks
+            </button>
+            <button class="nav-tab" data-tab="hours">
+                <span class="tab-icon">⏱</span> Hours
+            </button>
+        </nav>
+
+        <!-- ================================================================= -->
+        <!-- SUMMARY TAB                                                       -->
+        <!-- ================================================================= -->
+        <section id="tab-summary" class="tab-content active">
+            <!-- Stat cards row -->
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <span class="stat-label">Total Tasks</span>
+                    <span class="stat-value" id="stat-total">—</span>
+                </div>
+                <div class="stat-card stat-complete">
+                    <span class="stat-label">Completed</span>
+                    <span class="stat-value" id="stat-complete">—</span>
+                </div>
+                <div class="stat-card stat-overdue">
+                    <span class="stat-label">Overdue</span>
+                    <span class="stat-value" id="stat-overdue">—</span>
+                </div>
+                <div class="stat-card stat-upcoming">
+                    <span class="stat-label">Due Soon (14d)</span>
+                    <span class="stat-value" id="stat-upcoming">—</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Total Hours</span>
+                    <span class="stat-value" id="stat-hours">—</span>
+                </div>
+            </div>
+
+            <!-- Two-column layout: team chart + member leaderboard -->
+            <div class="summary-grid">
+                <div class="card">
+                    <h2 class="card-title">Hours by Team</h2>
+                    <div id="team-chart" class="chart-container"></div>
+                </div>
+                <div class="card">
+                    <h2 class="card-title">Member Hours Leaderboard</h2>
+                    <div id="member-leaderboard"></div>
+                </div>
+            </div>
+
+            <!-- Overdue spotlight -->
+            <div class="card" id="overdue-spotlight-card">
+                <h2 class="card-title">⚠ Overdue Tasks</h2>
+                <div id="overdue-spotlight"></div>
+            </div>
+
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- TASKS TAB                                                         -->
+        <!-- ================================================================= -->
+        <section id="tab-tasks" class="tab-content">
+            <!-- Sub-tabs for task views -->
+            <div class="sub-tabs">
+                <button class="sub-tab active" data-subtab="overdue">🔴 Overdue</button>
+                <button class="sub-tab" data-subtab="upcoming">🟡 Upcoming</button>
+                <button class="sub-tab" data-subtab="all">📄 All Tasks</button>
+            </div>
+
+            <div class="task-controls">
+                <input type="text" id="task-search" placeholder="Search tasks…" class="search-input">
+                <select id="task-team-filter" class="filter-select">
+                    <option value="">All Teams</option>
+                </select>
+            </div>
+
+            <div id="subtab-overdue" class="subtab-content active">
+                <div id="overdue-list" class="task-list"></div>
+            </div>
+            <div id="subtab-upcoming" class="subtab-content">
+                <div id="upcoming-list" class="task-list"></div>
+            </div>
+            <div id="subtab-all" class="subtab-content">
+                <div id="all-list" class="task-list"></div>
+            </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- HOURS TAB                                                         -->
+        <!-- ================================================================= -->
+        <section id="tab-hours" class="tab-content">
+            <div class="sub-tabs">
+                <button class="sub-tab active" data-subtab="hours-week">📅 This Week</button>
+                <button class="sub-tab" data-subtab="hours-member">👤 All-Time by Member</button>
+                <button class="sub-tab" data-subtab="hours-team">👥 All-Time by Team</button>
+                <button class="sub-tab" data-subtab="hours-task">📌 All-Time by Task</button>
+            </div>
+
+            <div id="subtab-hours-week" class="subtab-content active">
+                <div class="week-nav">
+                    <button id="week-prev" class="btn-week-nav">← Prev</button>
+                    <span id="week-label" class="week-label">This Week</span>
+                    <button id="week-next" class="btn-week-nav">Next →</button>
+                </div>
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <span class="stat-label">Week Hours</span>
+                        <span class="stat-value" id="week-total-hours">—</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Active Members</span>
+                        <span class="stat-value" id="week-active-members">—</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Tasks Worked</span>
+                        <span class="stat-value" id="week-tasks-worked">—</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <h2 class="card-title">Hours by Team</h2>
+                    <div id="week-team-chart" class="chart-container"></div>
+                </div>
+                <div class="summary-grid">
+                    <div class="card">
+                        <h2 class="card-title">🏆 Top Performers</h2>
+                        <div id="week-top-performers"></div>
+                    </div>
+                    <div class="card">
+                        <h2 class="card-title">⚠ Lowest Hours</h2>
+                        <div id="week-bottom-performers"></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h2 class="card-title">Tasks Being Worked On</h2>
+                    <div id="week-active-tasks"></div>
+                </div>
+            </div>
+            <div id="subtab-hours-member" class="subtab-content">
+                <div class="card">
+                    <h2 class="card-title">Hours per Member per Week</h2>
+                    <div class="table-scroll">
+                        <table id="table-member-hours" class="pivot-table"></table>
+                    </div>
+                </div>
+            </div>
+            <div id="subtab-hours-team" class="subtab-content">
+                <div class="card">
+                    <h2 class="card-title">Hours per Team per Week</h2>
+                    <div class="table-scroll">
+                        <table id="table-team-hours" class="pivot-table"></table>
+                    </div>
+                </div>
+            </div>
+            <div id="subtab-hours-task" class="subtab-content">
+                <div class="card">
+                    <h2 class="card-title">Hours per Task per Week</h2>
+                    <div class="table-scroll">
+                        <table id="table-task-hours" class="pivot-table"></table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
