@@ -83,7 +83,8 @@ function parseMemberName(resourceName) {
         return { fullName: name, team: 'UNKNOWN', memberClass: 'UNKNOWN' };
     }
 
-    const team = parts[0].toUpperCase();
+    let team = parts[0].toUpperCase();
+    if (team === 'PLAN') team = 'PLANNING'; // Alias PLAN -> PLANNING
     const fullName = parts[1];
     let memberClass = parts[2].toUpperCase();
 
@@ -423,10 +424,25 @@ function renderWeekView() {
         const task = STATE.taskMap[taskId];
         const taskName = task ? task.name : `Task ${taskId}`;
         const taskEndDate = task ? task.end_date : null;
-        if (!taskHours[taskId]) taskHours[taskId] = { name: taskName, hours: 0, members: new Set(), endDate: taskEndDate };
+        if (!taskHours[taskId]) {
+            taskHours[taskId] = {
+                id: taskId,
+                name: taskName,
+                hours: 0,
+                members: new Set(),
+                endDate: taskEndDate,
+                breakdown: {}
+            };
+        }
         taskHours[taskId].hours += hours;
         taskHours[taskId].members.add(name);
+
+        if (!taskHours[taskId].breakdown[name]) taskHours[taskId].breakdown[name] = 0;
+        taskHours[taskId].breakdown[name] += hours;
     });
+
+    // Save for modal access
+    STATE.weekTaskData = taskHours;
 
     // Stats
     document.getElementById('week-total-hours').textContent = Math.round(totalHours).toLocaleString();
@@ -523,24 +539,76 @@ function renderWeekView() {
                 }
             }
             const div = document.createElement('div');
-            div.className = 'task-item';
+            div.className = 'task-item task-clickable';
+            div.onclick = (e) => toggleTaskBreakdown(t.id, e);
             const dueDateStr = t.endDate ? (() => {
                 const d = new Date(t.endDate + 'T00:00:00');
                 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
                 return `Due: ${months[d.getMonth()]} ${d.getDate()}`;
             })() : '';
             div.innerHTML = `
-              <div>
-                <div class="task-name">${esc(t.name)}</div>
-                <div class="task-group">${dueDateStr ? `<span style="color:var(--text-secondary);margin-right:8px">${dueDateStr}</span>` : ''}${Array.from(t.members).slice(0, 5).map(n => esc(n)).join(', ')}${t.members.size > 5 ? ` +${t.members.size - 5} more` : ''}</div>
+              <div class="task-main-row">
+                <div>
+                    <div class="task-name">${esc(t.name)}</div>
+                    <div class="task-group">${dueDateStr ? `<span style="color:var(--text-secondary);margin-right:8px">${dueDateStr}</span>` : ''}${Array.from(t.members).slice(0, 5).map(n => esc(n)).join(', ')}${t.members.size > 5 ? ` +${t.members.size - 5} more` : ''}</div>
+                </div>
+                <div style="display:flex;gap:8px;align-items:center">
+                    ${dueBadge}
+                    <span class="status-badge">${Math.round(t.hours)}h</span>
+                </div>
               </div>
-              <div style="display:flex;gap:8px;align-items:center">
-                ${dueBadge}
-                <span class="status-badge">${Math.round(t.hours)}h</span>
-              </div>
+              <div id="breakdown-${t.id}" class="task-breakdown hidden"></div>
             `;
             tasksContainer.appendChild(div);
         });
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Inline Expansion Logic
+// ---------------------------------------------------------------------------
+function toggleTaskBreakdown(taskId, event) {
+    // Prevent triggering if clicking inside the breakdown itself
+    if (event.target.closest('.task-breakdown')) return;
+
+    const breakdownEl = document.getElementById(`breakdown-${taskId}`);
+    if (!breakdownEl) return;
+
+    const isHidden = breakdownEl.classList.contains('hidden');
+
+    // Close other open breakdowns (optional, but keeps UI clean)
+    document.querySelectorAll('.task-breakdown').forEach(el => {
+        if (el.id !== `breakdown-${taskId}`) el.classList.add('hidden');
+    });
+
+    if (isHidden) {
+        // Populate if empty
+        if (breakdownEl.innerHTML.trim() === '') {
+            const taskData = STATE.weekTaskData[taskId];
+            if (taskData) {
+                const sortedMembers = Object.entries(taskData.breakdown).sort((a, b) => b[1] - a[1]);
+                if (sortedMembers.length === 0) {
+                    breakdownEl.innerHTML = '<div class="empty-state-sm">No hours recorded.</div>';
+                } else {
+                    let html = '<div class="breakdown-list">';
+                    sortedMembers.forEach(([name, hours]) => {
+                        html += `
+                            <div class="breakdown-row-inline">
+                                <div class="breakdown-name">${esc(name)}</div>
+                                <div class="breakdown-hours-container">
+                                    <span class="breakdown-hours">${Math.round(hours * 10) / 10}h</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                    breakdownEl.innerHTML = html;
+                }
+            }
+        }
+        breakdownEl.classList.remove('hidden');
+    } else {
+        breakdownEl.classList.add('hidden');
     }
 }
 
@@ -997,4 +1065,51 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-refresh').addEventListener('click', refreshData);
 
     loadData();
+});
+
+// ---------------------------------------------------------------------------
+// Task Modal Logic
+// ---------------------------------------------------------------------------
+function showTaskBreakdown(taskId) {
+    console.log('showTaskBreakdown called for:', taskId);
+    if (!STATE.weekTaskData || !STATE.weekTaskData[taskId]) {
+        console.error('No data found for task:', taskId);
+        return;
+    }
+    const task = STATE.weekTaskData[taskId];
+
+    document.getElementById('modal-title').textContent = task.name;
+    const body = document.getElementById('modal-body');
+    body.innerHTML = '';
+
+    const breakdown = Object.entries(task.breakdown || {})
+        .sort((a, b) => b[1] - a[1]); // Sort by hours descending
+
+    breakdown.forEach(([member, hours]) => {
+        const row = document.createElement('div');
+        row.className = 'breakdown-row';
+        row.innerHTML = `
+            <span class="breakdown-name">${esc(member)}</span>
+            <span class="breakdown-hours">${hours.toFixed(1)}h</span>
+        `;
+        body.appendChild(row);
+    });
+
+    const modal = document.getElementById('task-modal');
+    modal.classList.add('active');
+}
+
+function closeModal() {
+    const modal = document.getElementById('task-modal');
+    modal.classList.remove('active');
+}
+
+// Close modal when clicking outside
+document.getElementById('task-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'task-modal') closeModal();
+});
+
+// ESC key to close
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
 });

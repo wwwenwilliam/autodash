@@ -607,6 +607,15 @@ body {
   white-space: nowrap;
 }
 
+.task-item.task-clickable {
+  cursor: pointer;
+}
+
+.task-item.task-clickable:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent);
+}
+
 .status-badge {
   font-size: 0.72rem;
   font-weight: 600;
@@ -884,4 +893,85 @@ body {
   .stat-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+}
+
+/* --- Inline Breakdown -------------------------------------------------- */
+.task-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+}
+
+.task-main-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 18px;
+  width: 100%;
+}
+
+.task-breakdown {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  border-top: 1px solid var(--border-subtle);
+  animation: slideDown 0.2s ease-out;
+}
+
+.task-breakdown.hidden {
+  display: none;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.breakdown-list {
+  padding: 8px 18px 14px;
+}
+
+.breakdown-row-inline {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  align-items: center;
+  padding: 8px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.85rem;
+}
+
+.breakdown-row-inline:last-child {
+  border-bottom: none;
+}
+
+.breakdown-hours-container {
+  padding-right: 12px;
+  /* Align with text inside status-badge (which has 12px padding) */
+}
+
+.breakdown-hours {
+  font-family: var(--font-mono);
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 0.75rem;
+  /* Close match to status-badge 0.72rem */
+  display: block;
+  text-align: right;
+  min-width: 40px;
+}
+
+.empty-state-sm {
+  padding: 12px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.8rem;
 }

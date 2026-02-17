@@ -39601,123 +39601,9 @@
     },
     {
       "company_id": 2669052,
-      "id": 165882731,
-      "name": "Edge Node Integration",
-      "parent_group_name": "Vehicle Interface : CAN over Edge",
-      "project_id": 4336931,
-      "project_name": "R2Y5",
-      "type": "task",
-      "checklist_info": {
-        "count": 0,
-        "completed": 0
-      },
-      "color": "blue2",
-      "comment_info": {
-        "count": 0,
-        "has_unread": false
-      },
-      "days": 0,
-      "dependencies": {
-        "parents": [],
-        "children": []
-      },
-      "document_info": {
-        "count": 0,
-        "edit_date": null,
-        "view_date": null,
-        "has_unread": false
-      },
-      "end_date": null,
-      "estimate": null,
-      "estimated_hours": 0,
-      "expected_percent_complete": null,
-      "has_tracked_time": false,
-      "is_critical": null,
-      "slack": null,
-      "actual_hours": 0,
-      "is_estimated_hours_enabled": false,
-      "is_starred": false,
-      "is_time_tracking_enabled": true,
-      "parent_group_id": 35751866,
-      "percent_complete": 0,
-      "project_is_starred": false,
-      "project_permission": "admin",
-      "resources": [],
-      "sort": 5,
-      "start_date": null,
-      "wbs": "14.3.5",
-      "work_days_left": null,
-      "created_by": 14641060,
-      "created_at": "2026-01-31T21:22:09Z",
-      "updated_by": 14641060,
-      "updated_at": "2026-02-17T04:47:01Z",
-      "custom_field_values": null,
-      "roj": null,
-      "materials": [],
-      "allow_scheduling_on_holidays": null
-    },
-    {
-      "company_id": 2669052,
-      "id": 165882725,
-      "name": "Traffic Light <> RSU",
-      "parent_group_name": "Vehicle Interface : V2X",
-      "project_id": 4336931,
-      "project_name": "R2Y5",
-      "type": "task",
-      "checklist_info": {
-        "count": 0,
-        "completed": 0
-      },
-      "color": "blue2",
-      "comment_info": {
-        "count": 0,
-        "has_unread": false
-      },
-      "days": 0,
-      "dependencies": {
-        "parents": [],
-        "children": []
-      },
-      "document_info": {
-        "count": 0,
-        "edit_date": null,
-        "view_date": null,
-        "has_unread": false
-      },
-      "end_date": null,
-      "estimate": null,
-      "estimated_hours": 0,
-      "expected_percent_complete": null,
-      "has_tracked_time": false,
-      "is_critical": null,
-      "slack": null,
-      "actual_hours": 0,
-      "is_estimated_hours_enabled": false,
-      "is_starred": false,
-      "is_time_tracking_enabled": true,
-      "parent_group_id": 35751870,
-      "percent_complete": 0,
-      "project_is_starred": false,
-      "project_permission": "admin",
-      "resources": [],
-      "sort": 1,
-      "start_date": null,
-      "wbs": "14.4.1",
-      "work_days_left": null,
-      "created_by": 14641060,
-      "created_at": "2026-01-31T21:18:54Z",
-      "updated_by": 14641060,
-      "updated_at": "2026-01-31T21:18:54Z",
-      "custom_field_values": null,
-      "roj": null,
-      "materials": [],
-      "allow_scheduling_on_holidays": null
-    },
-    {
-      "company_id": 2669052,
       "id": 165882727,
       "name": "Traffic Light <> RSU",
-      "parent_group_name": "Vehicle Interface",
+      "parent_group_name": "Vehicle Interface : V2X",
       "project_id": 4336931,
       "project_name": "R2Y5",
       "type": "task",
@@ -39799,7 +39685,7 @@
       "is_estimated_hours_enabled": false,
       "is_starred": false,
       "is_time_tracking_enabled": true,
-      "parent_group_id": 35038080,
+      "parent_group_id": 35751870,
       "percent_complete": 0,
       "project_is_starred": false,
       "project_permission": "admin",
@@ -39835,9 +39721,9 @@
           "schedule_confirmation": []
         }
       ],
-      "sort": 5,
+      "sort": 1,
       "start_date": "2026-01-02",
-      "wbs": "14.5",
+      "wbs": "14.4.1",
       "work_days_left": 4,
       "created_by": 14641060,
       "created_at": "2026-01-31T21:20:16Z",
@@ -39852,7 +39738,7 @@
       "company_id": 2669052,
       "id": 165882732,
       "name": "RSU <> PC",
-      "parent_group_name": "Vehicle Interface",
+      "parent_group_name": "Vehicle Interface : V2X",
       "project_id": 4336931,
       "project_name": "R2Y5",
       "type": "task",
@@ -40016,7 +39902,7 @@
       "is_estimated_hours_enabled": false,
       "is_starred": false,
       "is_time_tracking_enabled": true,
-      "parent_group_id": 35038080,
+      "parent_group_id": 35751870,
       "percent_complete": 0,
       "project_is_starred": false,
       "project_permission": "admin",
@@ -40052,9 +39938,9 @@
           "schedule_confirmation": []
         }
       ],
-      "sort": 6,
+      "sort": 2,
       "start_date": "2026-02-21",
-      "wbs": "14.6",
+      "wbs": "14.4.2",
       "work_days_left": 32,
       "created_by": 14641060,
       "created_at": "2026-01-31T21:22:37Z",
@@ -40223,9 +40109,9 @@
           "schedule_confirmation": []
         }
       ],
-      "sort": 7,
+      "sort": 5,
       "start_date": "2026-03-21",
-      "wbs": "14.7",
+      "wbs": "14.5",
       "work_days_left": 67,
       "created_by": 14641060,
       "created_at": "2026-01-31T21:23:09Z",
@@ -40411,9 +40297,9 @@
       "project_is_starred": false,
       "project_permission": "admin",
       "resources": [],
-      "sort": 8,
+      "sort": 6,
       "start_date": "2026-04-25",
-      "wbs": "14.8",
+      "wbs": "14.6",
       "work_days_left": 68,
       "created_by": 14641060,
       "created_at": "2026-02-14T05:30:37Z",
@@ -104195,5 +104081,5 @@
       "user_id": 14638981
     }
   ],
-  "fetchedAt": "2026-02-17T19:23:42.305Z"
+  "fetchedAt": "2026-02-17T20:12:40.920Z"
 }
