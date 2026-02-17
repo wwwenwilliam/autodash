@@ -685,16 +685,18 @@ function renderTaskList(containerId, tasks) {
         div.dataset.teams = teamNames.join(',').toUpperCase();
         div.dataset.taskName = (t.name || '').toLowerCase();
         div.innerHTML = `
-      <div>
-        <div class="task-name">${esc(t.name)}</div>
-        ${groupName ? `<div class="task-group">${esc(groupName)}</div>` : ''}
+      <div class="task-main-row">
+          <div>
+            <div class="task-name">${esc(t.name)}</div>
+            ${groupName ? `<div class="task-group">${esc(groupName)}</div>` : ''}
+          </div>
+          <div class="task-dates">${t.start_date || '?'} → ${t.end_date || '?'}</div>
+          <div class="task-resources">
+            ${resources.slice(0, 3).map(r => `<span class="resource-badge">${esc(r)}</span>`).join('')}
+            ${resources.length > 3 ? `<span class="resource-badge">+${resources.length - 3}</span>` : ''}
+          </div>
+          <span class="status-badge ${statusClass}">${statusLabel}</span>
       </div>
-      <div class="task-dates">${t.start_date || '?'} → ${t.end_date || '?'}</div>
-      <div class="task-resources">
-        ${resources.slice(0, 3).map(r => `<span class="resource-badge">${esc(r)}</span>`).join('')}
-        ${resources.length > 3 ? `<span class="resource-badge">+${resources.length - 3}</span>` : ''}
-      </div>
-      <span class="status-badge ${statusClass}">${statusLabel}</span>
     `;
         container.appendChild(div);
     });
