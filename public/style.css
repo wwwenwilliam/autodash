@@ -557,6 +557,38 @@ body {
   gap: 8px;
 }
 
+.task-team-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 18px;
+  margin-top: 8px;
+  background: linear-gradient(135deg, rgba(99, 140, 255, 0.12) 0%, rgba(249, 115, 22, 0.08) 100%);
+  border: 1px solid rgba(99, 140, 255, 0.2);
+  border-radius: var(--radius-sm);
+}
+
+.task-team-header:first-child {
+  margin-top: 0;
+}
+
+.task-team-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.task-team-count {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: rgba(99, 140, 255, 0.15);
+  color: #638cff;
+}
+
 .task-item {
   display: flex;
   flex-direction: column;

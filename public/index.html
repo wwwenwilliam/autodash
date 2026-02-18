@@ -57,6 +57,9 @@
             <button class="nav-tab" data-tab="tasks">
                 <span class="tab-icon">📋</span> Tasks
             </button>
+            <button class="nav-tab" data-tab="weekly">
+                <span class="tab-icon">📅</span> Weekly
+            </button>
             <button class="nav-tab" data-tab="hours">
                 <span class="tab-icon">⏱</span> Hours
             </button>
@@ -140,56 +143,59 @@
         </section>
 
         <!-- ================================================================= -->
+        <!-- WEEKLY TAB                                                        -->
+        <!-- ================================================================= -->
+        <section id="tab-weekly" class="tab-content">
+            <div class="week-nav">
+                <button id="week-prev" class="btn-week-nav">← Prev</button>
+                <span id="week-label" class="week-label">This Week</span>
+                <button id="week-next" class="btn-week-nav">Next →</button>
+            </div>
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <span class="stat-label">Week Hours</span>
+                    <span class="stat-value" id="week-total-hours">—</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Active Members</span>
+                    <span class="stat-value" id="week-active-members">—</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Tasks Worked</span>
+                    <span class="stat-value" id="week-tasks-worked">—</span>
+                </div>
+            </div>
+            <div class="card">
+                <h2 class="card-title">Hours by Team</h2>
+                <div id="week-team-chart" class="chart-container"></div>
+            </div>
+            <div class="summary-grid">
+                <div class="card">
+                    <h2 class="card-title">🏆 Top Performers</h2>
+                    <div id="week-top-performers"></div>
+                </div>
+                <div class="card">
+                    <h2 class="card-title">⚠ Lowest Hours</h2>
+                    <div id="week-bottom-performers"></div>
+                </div>
+            </div>
+            <div class="card">
+                <h2 class="card-title">Tasks Being Worked On</h2>
+                <div id="week-active-tasks"></div>
+            </div>
+        </section>
+
+        <!-- ================================================================= -->
         <!-- HOURS TAB                                                         -->
         <!-- ================================================================= -->
         <section id="tab-hours" class="tab-content">
             <div class="sub-tabs">
-                <button class="sub-tab active" data-subtab="hours-week">📅 This Week</button>
-                <button class="sub-tab" data-subtab="hours-member">👤 All-Time by Member</button>
-                <button class="sub-tab" data-subtab="hours-team">👥 All-Time by Team</button>
-                <button class="sub-tab" data-subtab="hours-task">📌 All-Time by Task</button>
+                <button class="sub-tab active" data-subtab="hours-member">👤 By Member</button>
+                <button class="sub-tab" data-subtab="hours-team">👥 By Team</button>
+                <button class="sub-tab" data-subtab="hours-task">📌 By Task</button>
             </div>
 
-            <div id="subtab-hours-week" class="subtab-content active">
-                <div class="week-nav">
-                    <button id="week-prev" class="btn-week-nav">← Prev</button>
-                    <span id="week-label" class="week-label">This Week</span>
-                    <button id="week-next" class="btn-week-nav">Next →</button>
-                </div>
-                <div class="stat-grid">
-                    <div class="stat-card">
-                        <span class="stat-label">Week Hours</span>
-                        <span class="stat-value" id="week-total-hours">—</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-label">Active Members</span>
-                        <span class="stat-value" id="week-active-members">—</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-label">Tasks Worked</span>
-                        <span class="stat-value" id="week-tasks-worked">—</span>
-                    </div>
-                </div>
-                <div class="card">
-                    <h2 class="card-title">Hours by Team</h2>
-                    <div id="week-team-chart" class="chart-container"></div>
-                </div>
-                <div class="summary-grid">
-                    <div class="card">
-                        <h2 class="card-title">🏆 Top Performers</h2>
-                        <div id="week-top-performers"></div>
-                    </div>
-                    <div class="card">
-                        <h2 class="card-title">⚠ Lowest Hours</h2>
-                        <div id="week-bottom-performers"></div>
-                    </div>
-                </div>
-                <div class="card">
-                    <h2 class="card-title">Tasks Being Worked On</h2>
-                    <div id="week-active-tasks"></div>
-                </div>
-            </div>
-            <div id="subtab-hours-member" class="subtab-content">
+            <div id="subtab-hours-member" class="subtab-content active">
                 <div class="card">
                     <h2 class="card-title">Hours per Member per Week</h2>
                     <div class="table-scroll">

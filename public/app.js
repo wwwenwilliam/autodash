@@ -615,6 +615,12 @@ function toggleTaskBreakdown(taskId, event) {
 // ---------------------------------------------------------------------------
 // Render — Tasks Tab
 // ---------------------------------------------------------------------------
+function getTaskTeam(task) {
+    const pgn = task.parent_group_name || '';
+    const top = pgn.split(':')[0].trim();
+    return top || 'Other';
+}
+
 function renderTasks() {
     const tasks = STATE.tasks;
     const overdue = [], upcoming = [], all = [];
@@ -636,13 +642,12 @@ function renderTasks() {
     renderTaskList('upcoming-list', upcoming);
     renderTaskList('all-list', all);
 
-    const teams = new Set();
-    Object.values(STATE.members).forEach(m => {
-        if (!EXCLUDED_TEAMS.has(m.team)) teams.add(m.team);
-    });
+    // Populate team filter dropdown from top-level groups
+    const teamGroups = new Set();
+    STATE.tasks.forEach(t => teamGroups.add(getTaskTeam(t)));
     const filterEl = document.getElementById('task-team-filter');
     filterEl.innerHTML = '<option value="">All Teams</option>';
-    Array.from(teams).sort().forEach(t => {
+    Array.from(teamGroups).sort().forEach(t => {
         filterEl.innerHTML += `<option value="${esc(t)}">${esc(t)}</option>`;
     });
 
@@ -659,57 +664,93 @@ function renderTaskList(containerId, tasks) {
         return;
     }
 
+    // Group tasks by top-level team
+    const grouped = {};
     tasks.forEach(t => {
-        const groupName = STATE.groupMap[t.parent_group_id]?.name || '';
-        const resources = (t.resources || []).map(r => {
-            const parsed = parseMemberName(r.name);
-            return parsed ? parsed.fullName : r.name;
-        });
+        const team = getTaskTeam(t);
+        if (!grouped[team]) grouped[team] = [];
+        grouped[team].push(t);
+    });
 
-        const statusLabel = {
-            overdue: 'Overdue',
-            upcoming: 'Due Soon',
-            complete: 'Complete',
-            active: 'Active',
-        }[t._status] || 'Active';
+    // Sort team names alphabetically
+    const sortedTeams = Object.keys(grouped).sort();
 
-        const statusClass = `status-${t._status}`;
+    sortedTeams.forEach(team => {
+        // Team header
+        const header = document.createElement('div');
+        header.className = 'task-team-header';
+        header.dataset.teamGroup = team;
+        header.innerHTML = `
+            <span class="task-team-name">${esc(team)}</span>
+            <span class="task-team-count">${grouped[team].length}</span>
+        `;
+        container.appendChild(header);
 
-        const teamNames = (t.resources || []).map(r => {
-            const parsed = parseMemberName(r.name);
-            return parsed ? parsed.team : '';
-        });
+        // Tasks within team
+        grouped[team].forEach(t => {
+            const groupName = t.parent_group_name || '';
+            // Show sub-group (after the colon) if present
+            const subGroup = groupName.includes(':') ? groupName.split(':').slice(1).join(':').trim() : '';
+            const resources = (t.resources || []).map(r => {
+                const parsed = parseMemberName(r.name);
+                return parsed ? parsed.fullName : r.name;
+            });
 
-        const div = document.createElement('div');
-        div.className = 'task-item';
-        div.dataset.teams = teamNames.join(',').toUpperCase();
-        div.dataset.taskName = (t.name || '').toLowerCase();
-        div.innerHTML = `
-      <div class="task-main-row">
-          <div>
-            <div class="task-name">${esc(t.name)}</div>
-            ${groupName ? `<div class="task-group">${esc(groupName)}</div>` : ''}
+            const statusLabel = {
+                overdue: 'Overdue',
+                upcoming: 'Due Soon',
+                complete: 'Complete',
+                active: 'Active',
+            }[t._status] || 'Active';
+
+            const statusClass = `status-${t._status}`;
+
+            const div = document.createElement('div');
+            div.className = 'task-item';
+            div.dataset.teamGroup = team;
+            div.dataset.taskName = (t.name || '').toLowerCase();
+            div.innerHTML = `
+          <div class="task-main-row">
+              <div>
+                <div class="task-name">${esc(t.name)}</div>
+                ${subGroup ? `<div class="task-group">${esc(subGroup)}</div>` : ''}
+              </div>
+              <div class="task-dates">${t.start_date || '?'} → ${t.end_date || '?'}</div>
+              <div class="task-resources">
+                ${resources.slice(0, 3).map(r => `<span class="resource-badge">${esc(r)}</span>`).join('')}
+                ${resources.length > 3 ? `<span class="resource-badge">+${resources.length - 3}</span>` : ''}
+              </div>
+              <span class="status-badge ${statusClass}">${statusLabel}</span>
           </div>
-          <div class="task-dates">${t.start_date || '?'} → ${t.end_date || '?'}</div>
-          <div class="task-resources">
-            ${resources.slice(0, 3).map(r => `<span class="resource-badge">${esc(r)}</span>`).join('')}
-            ${resources.length > 3 ? `<span class="resource-badge">+${resources.length - 3}</span>` : ''}
-          </div>
-          <span class="status-badge ${statusClass}">${statusLabel}</span>
-      </div>
-    `;
-        container.appendChild(div);
+        `;
+            container.appendChild(div);
+        });
     });
 }
 
 function filterTasks() {
     const search = (document.getElementById('task-search').value || '').toLowerCase();
-    const teamFilter = (document.getElementById('task-team-filter').value || '').toUpperCase();
+    const teamFilter = document.getElementById('task-team-filter').value || '';
 
+    // Filter task items
     document.querySelectorAll('.task-item').forEach(el => {
         const nameMatch = !search || (el.dataset.taskName || '').includes(search);
-        const teamMatch = !teamFilter || (el.dataset.teams || '').includes(teamFilter);
+        const teamMatch = !teamFilter || (el.dataset.teamGroup || '') === teamFilter;
         el.style.display = (nameMatch && teamMatch) ? '' : 'none';
+    });
+
+    // Show/hide team headers based on whether they have visible tasks
+    document.querySelectorAll('.task-team-header').forEach(header => {
+        const team = header.dataset.teamGroup;
+        const teamFilterMatch = !teamFilter || team === teamFilter;
+        if (!teamFilterMatch) {
+            header.style.display = 'none';
+            return;
+        }
+        // Check if any task items in this group are visible
+        const siblings = header.parentElement.querySelectorAll(`.task-item[data-team-group="${CSS.escape(team)}"]`);
+        const anyVisible = Array.from(siblings).some(el => el.style.display !== 'none');
+        header.style.display = anyVisible ? '' : 'none';
     });
 }
 
