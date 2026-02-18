@@ -558,15 +558,15 @@ body {
 }
 
 .task-item {
-  display: grid;
-  grid-template-columns: 1fr auto auto auto;
-  gap: 16px;
-  align-items: center;
-  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   transition: var(--transition);
+  overflow: hidden;
 }
 
 .task-item:hover {
@@ -896,12 +896,7 @@ body {
 }
 
 /* --- Inline Breakdown -------------------------------------------------- */
-.task-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  padding: 0;
-}
+
 
 .task-main-row {
   display: grid;

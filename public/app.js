@@ -441,7 +441,7 @@ function renderWeekView() {
         taskHours[taskId].breakdown[name] += hours;
     });
 
-    // Save for modal access
+    // Save for inline breakdown access
     STATE.weekTaskData = taskHours;
 
     // Stats
@@ -1069,49 +1069,4 @@ document.addEventListener('DOMContentLoaded', () => {
     loadData();
 });
 
-// ---------------------------------------------------------------------------
-// Task Modal Logic
-// ---------------------------------------------------------------------------
-function showTaskBreakdown(taskId) {
-    console.log('showTaskBreakdown called for:', taskId);
-    if (!STATE.weekTaskData || !STATE.weekTaskData[taskId]) {
-        console.error('No data found for task:', taskId);
-        return;
-    }
-    const task = STATE.weekTaskData[taskId];
 
-    document.getElementById('modal-title').textContent = task.name;
-    const body = document.getElementById('modal-body');
-    body.innerHTML = '';
-
-    const breakdown = Object.entries(task.breakdown || {})
-        .sort((a, b) => b[1] - a[1]); // Sort by hours descending
-
-    breakdown.forEach(([member, hours]) => {
-        const row = document.createElement('div');
-        row.className = 'breakdown-row';
-        row.innerHTML = `
-            <span class="breakdown-name">${esc(member)}</span>
-            <span class="breakdown-hours">${hours.toFixed(1)}h</span>
-        `;
-        body.appendChild(row);
-    });
-
-    const modal = document.getElementById('task-modal');
-    modal.classList.add('active');
-}
-
-function closeModal() {
-    const modal = document.getElementById('task-modal');
-    modal.classList.remove('active');
-}
-
-// Close modal when clicking outside
-document.getElementById('task-modal').addEventListener('click', (e) => {
-    if (e.target.id === 'task-modal') closeModal();
-});
-
-// ESC key to close
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeModal();
-});
